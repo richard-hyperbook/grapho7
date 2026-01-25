@@ -11,7 +11,7 @@ import "button.dart";
 import 'package:intl/intl.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 
-const int versionNumber = 4;
+const int versionNumber = 5;
 
 appwrite.Client? client;
 appwrite.Databases? databases;
@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Grapho 7',
-      theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
+      //theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
       home: MyHomePage(title: 'Grapho7 (${versionNumber.toString()})'),
       debugShowCheckedModeBanner: false,
     );
