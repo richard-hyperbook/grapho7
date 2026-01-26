@@ -11,7 +11,7 @@ import "button.dart";
 import 'package:intl/intl.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 
-const int versionNumber = 5;
+const int versionNumber = 6;
 
 appwrite.Client? client;
 appwrite.Databases? databases;
@@ -300,7 +300,7 @@ class _MyHomePageState extends State<MyHomePage> {
       print('(LF8)${yy.length}');
       int rowIndex = 0;
       for (List<dynamic> xx in yy) {
-        print('(LF9)${xx}');
+        // print('(LF9)${xx}');
         List<String> row = [];
         for (int i = 0; i < 5; i++) {
           row.add(xx[i] as String);
