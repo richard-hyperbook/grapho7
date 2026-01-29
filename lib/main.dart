@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:appwrite/appwrite.dart' as appwrite;
 import 'package:appwrite/models.dart' as models;
@@ -10,8 +11,10 @@ import 'package:number_inc_dec/number_inc_dec.dart';
 import "button.dart";
 import 'package:intl/intl.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
-const int versionNumber = 6;
+
+const int versionNumber = 8;
 
 appwrite.Client? client;
 appwrite.Databases? databases;
@@ -56,6 +59,7 @@ class MyApp extends StatelessWidget {
       //theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
       home: MyHomePage(title: 'Grapho7 (${versionNumber.toString()})'),
       debugShowCheckedModeBanner: false,
+      builder: EasyLoading.init(),
     );
   }
 }
@@ -368,62 +372,7 @@ class _MyHomePageState extends State<MyHomePage> {
       fileNoB = '0#' + fileNoB;
     }
     return fileNoB.compareTo(fileNoA);
-    /*
-    if (searchField.length == 0) {
-      if (currentSection != ' ') {
-        return fileNoB.compareTo(fileNoA);
-      } else {
-        if ((fileNoA[0] == currentSection) && (fileNoB[0] == currentSection)) {
-          return fileNoB.compareTo(fileNoA);
-        } else {
-          if (fileNoA[0] == currentSection) {
-            return -1;
-          } else {
-            if (fileNoB[0] == currentSection) {
-              return 1;
-            }
-          }
-        }
-      }
-    } else {
-      if (currentSection != ' ') {
-        if ((nameA.contains(searchField)) && (nameB.contains(searchField))) {
-          return fileNoB.compareTo(fileNoA);
-        } else {
-          if (nameA.contains(searchField)) {
-            return -1;
-          } else {
-            if (nameB.contains(searchField)) {
-              return 1;
-            } else {
 
-            }
-
-
-
-
-          }
-        }
-      } else {
-        if ((fileNoA[0] == currentSection) &&
-            (fileNoB[0] == currentSection) &&
-            (nameA.contains(searchField)) &&
-            (nameB.contains(searchField))) {
-          return fileNoB.compareTo(fileNoA);
-        } else {
-          if ((fileNoA[0] == currentSection) && (nameA.contains(searchField))) {
-            return -1;
-          } else {
-            if ((fileNoB[0] == currentSection) &&
-                (nameA.contains(searchField))) {
-              return 1;
-            }
-          }
-        }
-
-      }
-
-   */
   }
 
   int maxVersion = 0;
@@ -471,7 +420,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       fileList = await storage.listFiles(
         bucketId: bucketId!,
-        queries: [appwrite.Query.limit(1000)],
+        queries: [appwrite.Query.limit(10000)],
       );
       //>print('(XY7)${fileList.files.length}');
       if (fileList.files.length < 1) {
@@ -490,19 +439,17 @@ class _MyHomePageState extends State<MyHomePage> {
     models.FileList? backupFileList = await listStorageFiles(
       bucketId: graphoStorageRef.path,
     );
-
+    maxVersion = 0;
     for (models.File file in backupFileList!.files) {
       String filename = file.name;
       print('(LF101)${filename}&&&&');
       List<String> splitFileName = filename.split('_');
       int? greatestVersionNumber = int.tryParse(splitFileName[1]);
-      maxVersion = 0;
       if (greatestVersionNumber != null) {
         if (maxVersion < greatestVersionNumber!)
           maxVersion = greatestVersionNumber;
       }
     }
-    // maxVersion++;
     print('(LF102)${maxVersion}');
     // setState(() {});
     // print('(LF103)${maxVersion}');
@@ -700,6 +647,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 // ),
                 ElevatedButton(
                   onPressed: () async {
+                    EasyLoading.show(dismissOnTap: false, status: "Loading...");
+
                     print(
                       '(LF21)${rows[1].rowItems![1].textController.text}...${rows[2].rowItems![2].textController.text}',
                     );
@@ -737,6 +686,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       '(LF22)${rows[1].rowItems![1].textController.text}...${rows[2].rowItems![2].textController.text}',
                     );
                     setState(() {});
+                    EasyLoading.dismiss();
                   },
                   child: Text('Sort ' + matches.toString()),
                   style: ButtonStyle(
