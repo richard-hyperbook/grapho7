@@ -12,9 +12,10 @@ import "button.dart";
 import 'package:intl/intl.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import './custom_animation.dart';
 
 
-const int versionNumber = 8;
+const int versionNumber = 9;
 
 appwrite.Client? client;
 appwrite.Databases? databases;
@@ -46,7 +47,27 @@ void main() {
   account = appwrite.Account(client!);
 
   runApp(const MyApp());
+  configLoading();
 }
+
+void configLoading() {
+  EasyLoading.instance
+    ..displayDuration = const Duration(milliseconds: 2000)
+    ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+    ..loadingStyle = EasyLoadingStyle.dark
+    ..indicatorSize = 45.0
+    ..radius = 10.0
+    ..progressColor = Colors.yellow
+    ..backgroundColor = Colors.green
+    ..indicatorColor = Colors.yellow
+    ..textColor = Colors.yellow
+    ..maskColor = Colors.blue.withOpacity(0.5)
+    ..userInteractions = true
+    ..dismissOnTap = true
+    ..customAnimation = CustomAnimation()
+   ;
+}
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -191,6 +212,15 @@ class _MyHomePageState extends State<MyHomePage> {
       content: '',
       width: 100,
     );
+
+    EasyLoading.addStatusCallback((status) {
+      print('EasyLoading Status $status');
+     /* if (status == EasyLoadingStatus.dismiss) {
+        _timer?.cancel();
+      }*/
+    });
+    EasyLoading.showSuccess('Use in initState');
+
     _gridViewController = ScrollController(initialScrollOffset: 0.0,);
   }
 
@@ -371,7 +401,11 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       fileNoB = '0#' + fileNoB;
     }
-    return fileNoB.compareTo(fileNoA);
+
+    int comp = fileNoB.compareTo(fileNoA);
+    // print('(LF700)${currentSection}(CA)${nameA.contains(searchField)}(CB)${nameB.contains(searchField)}');
+    // print('(LF701)${comp}(SF)$searchField(FA)$fileNoA(FB)$fileNoB(NA)$nameA(NB)$nameB');
+    return comp;
 
   }
 
@@ -528,11 +562,14 @@ class _MyHomePageState extends State<MyHomePage> {
   String? currentSection;
 
   Widget insertSectionSelection() {
+    if(currentSection == null){
+      currentSection = 'H';
+    }
     return DropdownButton<String>(
       /*key: ValueKey(
                     widget),
                 */
-      value: currentSection ?? 'H',
+      value: currentSection,
       hint: const Text('Section'),
       items: kSectionList.map<DropdownMenuItem<String>>((String item) {
         return DropdownMenuItem<String>(
@@ -559,6 +596,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     (context as Element).visitChildren(rebuild);
   }
+
 
   ScrollController? _gridViewController;
   @override
@@ -635,6 +673,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 insertSectionSelection(),
                 SizedBox(width: 50),
 
+                ElevatedButton(
+                  onPressed: () {
+                    _showDefaultLoading();
+                  },
+                  child: Text('Default Loading'),
+                ),
+
+
+
                 // FFButtonWidget(
                 //   text: 'Sort',
                 //   onPressed: () async {
@@ -646,11 +693,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 //   ),
                 // ),
                 ElevatedButton(
-                  onPressed: () async {
-                    EasyLoading.show(dismissOnTap: false, status: "Loading...");
+                  onPressed: ()  {
+                    print('(LF500)');
+                    // EasyLoading.show(maskType: EasyLoadingMaskType.black, status: "Loading...");
+
+                    _showDefaultLoading();
 
                     print(
-                      '(LF21)${rows[1].rowItems![1].textController.text}...${rows[2].rowItems![2].textController.text}',
+                      '(LF501)${rows[1].rowItems![1].textController.text}...${rows[2].rowItems![2].textController.text}',
                     );
                     rows.sort(rowSortComparison);
                     matches = 0;
@@ -686,7 +736,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       '(LF22)${rows[1].rowItems![1].textController.text}...${rows[2].rowItems![2].textController.text}',
                     );
                     setState(() {});
-                    EasyLoading.dismiss();
+                    print('(LF502)');
+
+                     EasyLoading.dismiss();
                   },
                   child: Text('Sort ' + matches.toString()),
                   style: ButtonStyle(
@@ -782,7 +834,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   itemBuilder: (context, index) {
                     int modulus = index % 5;
                     int rowIndex = index ~/ 5;
-                    print('(LF16)${index}');
+                    // print('(LF16)${index}');
                     if (rows[rowIndex] == null) {
                       return Container();
                     }
@@ -810,16 +862,25 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          EasyLoading.show(status: 'Loading...');
           setState((){
             _gridViewController!.animateTo(
               _gridViewController!.position.minScrollExtent,
               curve: Curves.easeOut,
               duration: const Duration(milliseconds: 500),
             );});
+          EasyLoading.dismiss();
         },
         tooltip: 'Scroll to top',
         child: const Icon(Icons.upgrade),
       ),
     );
   }
+}
+void _showDefaultLoading() {
+  EasyLoading.show(status: 'Loading...');
+  // Simulate a background task
+  // Future.delayed(Duration(seconds: 5), () {
+  //   EasyLoading.dismiss();
+  // });
 }
